@@ -92,10 +92,13 @@ RxJava 的异步实现，是通过一种扩展的观察者模式来实现的。
 观察者模式面向的需求是：A 对象（观察者）对 B 对象（被观察者）的某种变化高度敏感，需要在 B 变化的一瞬间做出反应。举个例子，新闻里喜闻乐见的警察抓小偷，警察需要在小偷伸手作案的时候实施抓捕。在这个例子里，警察是观察者，小偷是被观察者，警察需要时刻盯着小偷的一举一动，才能保证不会漏过任何瞬间。程序的观察者模式和这种真正的『观察』略有不同，观察者不需要时刻盯着被观察者（例如 A 不需要每过 2ms 就检查一次 B 的状态），而是采用注册(Register)或者称为订阅(Subscribe)的方式，告诉被观察者：我需要你的某某状态，你要在它变化的时候通知我。 Android 开发中一个比较典型的例子是点击监听器 OnClickListener 。对设置 OnClickListener 来说， View 是被观察者， OnClickListener 是观察者，二者通过 setOnClickListener() 方法达成订阅关系。订阅之后用户点击按钮的瞬间，Android Framework 就会将点击事件发送给已经注册的 OnClickListener 。采取这样被动的观察方式，既省去了反复检索状态的资源消耗，也能够得到最高的反馈速度。当然，这也得益于我们可以随意定制自己程序中的观察者和被观察者，而警察叔叔明显无法要求小偷『你在作案的时候务必通知我』。
 
 OnClickListener 的模式大致如下图：
+
 ![](http://ww3.sinaimg.cn/large/006tNc79jw1f5mgnudwztj30fz03rq33)
 
 如图所示，通过 setOnClickListener() 方法，Button 持有 OnClickListener 的引用（这一过程没有在图上画出）；当用户点击时，Button 自动调用 OnClickListener 的 onClick() 方法。另外，如果把这张图中的概念抽象出来（Button -> 被观察者、OnClickListener -> 观察者、setOnClickListener() -> 订阅，onClick() -> 事件），就由专用的观察者模式（例如只用于监听控件点击）转变成了通用的观察者模式。如下图：
+
 ![](http://ww3.sinaimg.cn/large/006tNc79jw1f5mgrkgjndj30ga03pq33)
+
 而 RxJava 作为一个工具库，使用的就是通用形式的观察者模式。
 
 ##### RxJava 的观察者模式
@@ -109,6 +112,7 @@ onError(): 事件队列异常。在事件处理过程中出异常时，onError()
 在一个正确运行的事件序列中, onCompleted() 和 onError() 有且只有一个，并且是事件序列中的最后一个。需要注意的是，onCompleted() 和 onError() 二者也是互斥的，即在队列中调用了其中一个，就不应该再调用另一个。
 
 RxJava 的观察者模式大致如下图：
+
 ![](http://ww3.sinaimg.cn/large/006tNc79jw1f5mh1t32cfj30gn04qweq)
 
 #### 2. 基本实现
@@ -180,7 +184,9 @@ Observable.subscribe(Subscriber) 的内部实现是这样的（仅核心代码�
 3.将传入的 Subscriber 作为 Subscription 返回。这是为了方便 unsubscribe().
 
 整个过程中对象间的关系如下图：
+
 ![](http://ww3.sinaimg.cn/large/006tNc79jw1f5mjkp8asnj30lk0a8js3)
+
 为了把原理用更清晰的方式表述出来，本文中挑选的都是功能尽可能简单的例子.
 由指定的一个 drawable 文件 id drawableRes 取得图片，并显示在 ImageView 中，并在出现异常的时候打印 Toast 报错：
 
@@ -295,7 +301,9 @@ RxJava 提供了对事件序列进行变换的支持，这是它的核心功能�
 可以看到，map() 方法将参数中的 String 对象转换成一个 Bitmap 对象后返回，而在经过 map() 方法后，事件的参数类型也由 String 转为了 Bitmap。这种直接变换对象并返回的，是最常见的也最容易理解的变换。不过 RxJava 的变换远不止这样，它不仅可以针对事件对象，还可以针对整个事件队列，这使得 RxJava 变得非常灵活。我列举几个常用的变换：
 
 map(): 事件对象的直接变换，具体功能上面已经介绍过。它是 RxJava 最常用的变换。 map() 的示意图
+
 ![](http://ww3.sinaimg.cn/large/006tNc79jw1f5mkqyxqnlj30hw0ea74u)
+
 至于变换的原理这里就不展开了，有兴趣可以看文章[给 Android 开发者的 RxJava 详解](http://gank.io/post/560e15be2dca930e00da1083)中的相应章节。
 
 #### 5.线程自由切换：Scheduler
@@ -500,3 +508,20 @@ RxBinding 是 Jake Wharton 的一个开源库，它提供了一套在 Android �
 [Awesome-RxJava](https://github.com/lzyzsd/Awesome-RxJava)
 
 [Alphabetical List of Observable Operators](https://github.com/ReactiveX/RxJava/wiki/Alphabetical-List-of-Observable-Operators)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
