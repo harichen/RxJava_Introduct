@@ -154,7 +154,7 @@ Observable 即被观察者，它决定什么时候触发事件以及触发怎样
 	});
 可以看到，这里传入了一个 OnSubscribe 对象作为参数。OnSubscribe 会被存储在返回的 Observable 对象中，它的作用相当于一个计划表，当 Observable 被订阅的时候，OnSubscribe 的 call() 方法会自动被调用，事件序列就会依照设定依次触发（对于上面的代码，就是观察者Subscriber 将会被调用三次 onNext() 和一次 onCompleted()）。这样，由被观察者调用了观察者的回调方法，就实现了由被观察者向观察者的事件传递，即观察者模式。
 
-**create() **方法是 RxJava 最基本的创造事件序列的方法。基于这个方法， RxJava 还提供了一些方法用来快捷创建事件队列，这里就不一一举例了。
+***create() ***方法是 RxJava 最基本的创造事件序列的方法。基于这个方法， RxJava 还提供了一些方法用来快捷创建事件队列，这里就不一一举例了。
 
 3) Subscribe (订阅)
 
@@ -236,14 +236,14 @@ Schedulers.computation(): 计算所使用的 Scheduler。这个计算指的是 C
 文字叙述总归难理解，上代码：
 
 	Observable.just(1, 2, 3, 4)
-    .subscribeOn(Schedulers.io()) // 指定 subscribe() 发生在 IO 线程
-    .observeOn(AndroidSchedulers.mainThread()) // 指定 Subscriber 的回调发生在主线程
-    .subscribe(new Action1<Integer>() {
-        @Override
-        public void call(Integer number) {
-            Log.d(tag, "number:" + number);
-        }
-    });
+              .subscribeOn(Schedulers.io()) // 指定 subscribe() 发生在 IO 线程
+              .observeOn(AndroidSchedulers.mainThread()) // 指定 Subscriber 的回调发生在主线程
+              .subscribe(new Action1<Integer>() {
+                  @Override
+                  public void call(Integer number) {
+                      Log.d(tag, "number:" + number);
+                  }
+              });
 上面这段代码中，由于 subscribeOn(Schedulers.io()) 的指定，被创建的事件的内容 1、2、3、4 将会在 IO 线程发出；而由于 observeOn(AndroidScheculers.mainThread()) 的指定，因此 subscriber 数字的打印将发生在主线程 。事实上，这种在 subscribe() 之前写上两句 subscribeOn(Scheduler.io()) 和 observeOn(AndroidSchedulers.mainThread()) 的使用方式非常常见，它适用于多数的 『后台线程取数据，主线程显示』的程序策略。
 
 而前面提到的由图片 id 取得图片并显示的例子，如果也加上这两句：
@@ -317,13 +317,13 @@ map(): 事件对象的直接变换，具体功能上面已经介绍过。它是 
 答案是：能。因为 **observeOn()** 指定的是 Subscriber 的线程，而这个 Subscriber 并不是（严格说应该为『不一定是』，但这里不妨理解为『不是』）subscribe() 参数中的 Subscriber ，而是 observeOn() 执行时的当前 Observable 所对应的 Subscriber ，即它的直接下级 Subscriber 。换句话说，observeOn() 指定的是它之后的操作所在的线程。因此如果有多次切换线程的需求，只要在每个想要切换线程的位置调用一次 observeOn() 即可。上代码：
 
 	Observable.just(1, 2, 3, 4) // IO 线程，由 subscribeOn() 指定
-    .subscribeOn(Schedulers.io())
-    .observeOn(Schedulers.newThread())
-    .map(mapOperator) // 新线程，由 observeOn() 指定
-    .observeOn(Schedulers.io())
-    .map(mapOperator2) // IO 线程，由 observeOn() 指定
-    .observeOn(AndroidSchedulers.mainThread) 
-    .subscribe(subscriber);  // Android 主线程，由 observeOn() 指定
+              .subscribeOn(Schedulers.io())
+              .observeOn(Schedulers.newThread())
+              .map(mapOperator) // 新线程，由 observeOn() 指定
+              .observeOn(Schedulers.io())
+              .map(mapOperator2) // IO 线程，由 observeOn() 指定
+              .observeOn(AndroidSchedulers.mainThread) 
+              .subscribe(subscriber);  // Android 主线程，由 observeOn() 指定
 如上，通过 observeOn() 的多次调用，程序实现了线程的多次切换。
 
 不过，不同于 observeOn() ， subscribeOn() 的位置放在哪里都可以，但它是只能调用一次的。
@@ -334,16 +334,16 @@ map(): 事件对象的直接变换，具体功能上面已经介绍过。它是 
 示例代码：
 
 	Observable.create(onSubscribe)
-    .subscribeOn(Schedulers.io())
-    .doOnSubscribe(new Action0() {
-        @Override
-        public void call() {
-            progressBar.setVisibility(View.VISIBLE); // 需要在主线程执行
-        }
-    })
-    .subscribeOn(AndroidSchedulers.mainThread()) // 指定主线程
-    .observeOn(AndroidSchedulers.mainThread())
-    .subscribe(subscriber);
+              .subscribeOn(Schedulers.io())
+              .doOnSubscribe(new Action0() {
+                  @Override
+                  public void call() {
+                      progressBar.setVisibility(View.VISIBLE); // 需要在主线程执行
+                  }
+              })
+              .subscribeOn(AndroidSchedulers.mainThread()) // 指定主线程
+              .observeOn(AndroidSchedulers.mainThread())
+              .subscribe(subscriber);
 如上，在 doOnSubscribe()的后面跟一个 subscribeOn() ，就能指定准备工作的线程了。
 
 ### RxJava 的适用场景和使用方式
@@ -489,8 +489,8 @@ RxBinding 是 Jake Wharton 的一个开源库，它提供了一套在 Android �
 看起来除了形式变了没什么区别，实质上也是这样。甚至如果你看一下它的源码，你会发现它连实现都没什么惊喜：它的内部是直接用一个包裹着的 setOnClickListener() 来实现的。然而，仅仅这一个形式的改变，却恰好就是 RxBinding 的目的：扩展性。通过 RxBinding 把点击监听转换成 Observable 之后，就有了对它进行扩展的可能。扩展的方式有很多，根据需求而定。一个例子是前面提到过的 throttleFirst() ，用于去抖动，也就是消除手抖导致的快速连环点击：
 
 	RxView.clickEvents(button)
-    .throttleFirst(500, TimeUnit.MILLISECONDS)
-    .subscribe(clickAction);
+          .throttleFirst(500, TimeUnit.MILLISECONDS)
+          .subscribe(clickAction);
 如果想对 RxBinding 有更多了解，可以去它的 [GitHub 项目](https://github.com/JakeWharton/RxBinding) 下面看看。
 ####3. 各种异步操作
 
