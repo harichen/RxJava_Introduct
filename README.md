@@ -472,7 +472,8 @@ Retrofit 除了提供了传统的 Callback 形式的 API，还有 RxJava 版本�
 后台代码和前台代码全都写在一条链中，明显清晰了很多。
 
 更多的例子请看：
-[rengwuxian RxJava Samples](https://github.com/rengwuxian/RxJavaSamples)。好，Retrofit 部分就到这里
+[RxJava_Introduct](https://github.com/harichen/RxJava_Introduct/)。好，Retrofit 部分就到这里
+
 ####2. RxBinding
 RxBinding 是 Jake Wharton 的一个开源库，它提供了一套在 Android 平台上的基于 RxJava 的 Binding API。所谓 Binding，就是类似设置 OnClickListener 、设置 TextWatcher 这样的注册绑定对象的 API。
 
